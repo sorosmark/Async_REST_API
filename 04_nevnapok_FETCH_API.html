@@ -9,14 +9,70 @@
 
 <body>
     <p id="valasz"></p>
+    <button id="nevnap_lekeres">Névnapok lekérése</button>
+
+    <form id="datum_form">
+        <label for="honap">Honap</label>
+        <input type="number" id="honap" name="honap" min="1" max="12" required>
+
+        <label for="nap">Nap</label>
+        <input type="number" id="nap" name="nap" min="1" max="31" required>
+
+        <button type="submit">Kereses</button>
+
+    </form>
+
+    <p id="post_valasz"></p>
     <script>
         async function nevnapok() {
             const response = await
                 fetch("https://nameday.abalin.net/api/V2/today");
             const nevek = await response.json();
-            document.getElementById("valasz").innerHTML = JSON.stringify(nevek.data);
+            document.getElementById("valasz").innerHTML = nevek.data.hu;
         }
-        nevnapok();
+
+        document.getElementById("nevnap_lekeres").addEventListener("click", nevnapok)
+        
+        async function nevnapPost() {
+            const data = {
+                "day" : nap,
+                "month" : honap
+            }
+
+            const response = await
+                fetch("https://nameday.abalin.net/api/V2/date", {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+
+                const nevek = await response.json();
+                console.log(nevek);
+                console.log(nevek.data);
+
+                nevek_str = ""
+                for (const property in nevek.data) {
+                    nevek_str += `<p> ${nyelvek}: ${nev} </p>`
+                }
+                document.getElementById("post_valasz").innerHTML =nevek.data
+
+        }
+
+        function nevnapMegjelenites(event){
+            event.preventDeffault()
+            const nap = document.getElementById("nap").value
+            const honap = document.getElementById("honap").value
+
+            console.log(nap, honap)
+            nevnapPost(nap, honap)
+        }
+
+        document.getElementById("datum_form").addEventListener("submit", nevnapMegjelenites)
+        //nevnapPost();
+    
     </script>
 
 </body>

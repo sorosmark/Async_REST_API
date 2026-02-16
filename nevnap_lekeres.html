@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Névnap lekérdezése név alapján</h2>
+
+    <form id="nev_form">
+        <label for="nev">Név:</label>
+        <input type="text" id="nev" name="nev" required>
+        <button type="submit">Keresés</button>
+    </form>
+
+    <p id="valasz"></p>
+
+    <script>
+        async function nevnapKereses(nev) {
+            const data = {
+                name: nev
+            };
+
+            const response = await fetch('https://nameday.abalin.net/api/V2/getname', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const eredmeny = await response.json();
+            console.log(eredmeny);
+
+            let kiiras = '';
+            
+            if (eredmeny.data && eredmeny.data.length > 0) {
+                eredmeny.data.forEach(item => {
+                    const adat = item["0"];
+                    kiiras += "Név: " + adat.name + "<br>";
+                    kiiras += "Hónap: " + adat.month + "<br>";
+                    kiiras += "Nap: " + adat.day + "<br>";
+                    kiiras += "Ország: " + item.country + "<br><br>";
+                });
+            } 
+            
+            document.getElementById('valasz').innerHTML = kiiras;
+        }
+
+        function formKezeles(event) {
+            event.preventDefault();
+            const nev = document.getElementById('nev').value;
+            nevnapKereses(nev);
+        }
+
+        document.getElementById('nev_form').addEventListener('submit', formKezeles);
+    </script>
+
+</body>
+</html>
